@@ -1,2 +1,3 @@
 docker start "kali"
-docker execute "sudo /etc/init.d/xrdp start"
+docker exec "kali" /etc/init.d/xrdp stop
+docker exec "kali" /etc/init.d/xrdp start
