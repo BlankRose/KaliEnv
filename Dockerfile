@@ -5,15 +5,16 @@
 #    '-._.(;;;)._.-'                                                           #
 #    .-'  ,`"`,  '-.                                                           #
 #   (__.-'/   \'-.__)  By: Rosie (https://github.com/BlankRose)                #
-#       //\   /        Last Updated: February 09, 2024 [02:03 pm]              #
+#       //\   /        Last Updated: February 09, 2024 [02:16 pm]              #
 #      ||  '-'                                                                 #
 # ############################################################################ #
 
 FROM kalilinux/kali-rolling
 
 # INSTALL BASE ENVIRONEMENT
+ARG env
 RUN apt-get update;\
-	apt-get install -y kali-desktop-i3 xrdp;
+	apt-get install -y kali-desktop-$env xrdp;
 
 # CREATE BASE USER
 ARG user

@@ -6,7 +6,7 @@
 #    '-._.(;;;)._.-'                                                           #
 #    .-'  ,`"`,  '-.                                                           #
 #   (__.-'/   \'-.__)  By: Rosie (https://github.com/BlankRose)                #
-#       //\   /        Last Updated: February 09, 2024 [02:00 pm]              #
+#       //\   /        Last Updated: February 09, 2024 [02:17 pm]              #
 #      ||  '-'                                                                 #
 # ############################################################################ #
 
@@ -14,8 +14,8 @@
 # And replace with defaults if non-existant
 # ############################
 
-names=(KALI_TAG   KALI_NAME  KALI_PORT  KALI_USER  KALI_PASS)
-value=(kali-home  kali       5500       kali       kali     )
+names=(KALI_TAG  KALI_NAME  KALI_PORT  KALI_USER  KALI_PASS  KALI_ENV)
+value=(kalienv   kali       5500       kali       kali       i3      )
 
 for i in "${!names[@]}"; do
 	if [ -z "${!names[$i]}" ]; then
@@ -53,6 +53,7 @@ cmd_start() {
 		else
 			if [ $(docker images -f reference=kali-home | wc -l) -lt 2 ]; then
 				docker build -t=$KALI_TAG \
+					--build-arg="env=$KALI_ENV" \
 					--build-arg="user=$KALI_USER" \
 					--build-arg="pass=$KALI_PASS" \
 					"$(dirname "$0")"
