@@ -62,7 +62,7 @@ you can use all availables features volumes may offer*
 
 You can freely customize the behaviours, such the port, or the login by exporting the following environnement variables:
 
-Name           | Default Value | Description
+Name           | Default       | Description
 ---------------|---------------|---------------------------------
 `KALI_TAG`     | `kalienv`     | Tag used to reference the docker image
 `KALI_NAME`    | `kali`        | Name of the generated container
@@ -70,5 +70,6 @@ Name           | Default Value | Description
 `KALI_USER`    | `kali`        | Name of the user created on first initialization
 `KALI_PASS`    | `kali`        | Password of the user created on first initialization
 `KALI_ENV`     | `i3`          | Name of the desktop environnement ([kali-desktop-`$KALI_ENV`](https://www.kali.org/tools/kali-meta/))
+`KALI_INSTALL` |               | List seperated by commas, of additional packages to initialize with
 `KALI_VOLUMES` |               | List seperated by commas, which defines volumes to setup
-`KALI_DETACH`  |               | When defined, on start it will runs on background instead
+`KALI_ATTACH`  |               | When defined, on start it will runs on foreground instead

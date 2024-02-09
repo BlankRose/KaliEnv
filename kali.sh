@@ -2,11 +2,11 @@
 # ############################################################################ #
 #          .-.                                                                 #
 #    __   /   \   __                                                           #
-#   (  `'.\   /.'`  )  kali                                                    #
+#   (  `'.\   /.'`  )  kali.sh                                                 #
 #    '-._.(;;;)._.-'                                                           #
 #    .-'  ,`"`,  '-.                                                           #
 #   (__.-'/   \'-.__)  By: Rosie (https://github.com/BlankRose)                #
-#       //\   /        Last Updated: February 09, 2024 [04:42 pm]              #
+#       //\   /        Last Updated: February 09, 2024 [05:57 pm]              #
 #      ||  '-'                                                                 #
 # ############################################################################ #
 
@@ -51,9 +51,11 @@ cmd_start() {
 			echo "Resuming session.."
 			docker start $opt $KALI_NAME
 		else
-			if [ $(docker images -f reference=kali-home | wc -l) -lt 2 ]; then
+			set -e
+			if [ $(docker images -f reference=$KALI_TAG | wc -l) -lt 2 ]; then
 				docker build -t=$KALI_TAG \
 					--build-arg="env=$KALI_ENV" \
+					--build-arg="pkg=$KALI_INSTALL" \
 					--build-arg="user=$KALI_USER" \
 					--build-arg="pass=$KALI_PASS" \
 					"$(dirname "$0")"
