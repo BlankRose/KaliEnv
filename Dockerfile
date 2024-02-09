@@ -5,7 +5,7 @@
 #    '-._.(;;;)._.-'                                                           #
 #    .-'  ,`"`,  '-.                                                           #
 #   (__.-'/   \'-.__)  By: Rosie (https://github.com/BlankRose)                #
-#       //\   /        Last Updated: February 09, 2024 [11:49 am]              #
+#       //\   /        Last Updated: February 09, 2024 [01:31 pm]              #
 #      ||  '-'                                                                 #
 # ############################################################################ #
 
@@ -21,4 +21,4 @@ RUN adduser kali;\
 	usermod -aG sudo kali;
 
 # ASSIGN STARTING POINT
-CMD [ "bash", "-c", "/etc/init.d/xrdp start; sleep inf" ]
+CMD [ "bash", "-c", "/etc/init.d/xrdp stop; /etc/init.d/xrdp start && sleep inf" ]

@@ -6,12 +6,28 @@
 #    '-._.(;;;)._.-'                                                           #
 #    .-'  ,`"`,  '-.                                                           #
 #   (__.-'/   \'-.__)  By: Rosie (https://github.com/BlankRose)                #
-#       //\   /        Last Updated: February 09, 2024 [11:37 am]              #
+#       //\   /        Last Updated: February 09, 2024 [01:35 pm]              #
 #      ||  '-'                                                                 #
 # ############################################################################ #
 
-if [ $# -eq 0 ] || [ "$1" = "help" ] || [ "$1" = "h" ]
-then
+# LOAD USED ENVIRONEMENTS
+# And replace with defaults if non-existant
+# ############################
+
+names=(KALI_TAG   KALI_NAME  KALI_PORT)
+value=(kali-home  kali       5500     )
+
+for i in "${!names[@]}"; do
+	if [ -z "${!names[$i]}" ]; then
+		export ${names[$i]}=${value[$i]}
+	fi
+done
+
+# DISPLAY HELP
+# Wether explicitly asked or not, or invalid commands
+# ############################
+
+cmd_help() {
 	echo "=== Kali Utility Script ==="
 	echo ""
 	echo "s | start    : Start KaliLinux"
@@ -20,50 +36,76 @@ then
 	echo "c | clear    : Clear instances"
 	echo "h | help     : Displays this"
 	exit 0
-fi
+}
 
-tag=kali-home
-name=kali
-port=5500
+# CREATE KALI DESKTOP ENVIRONEMENT
+# Or resumes if one already exists
+# ############################
 
-if [ "$1" = "start" ] || [ "$1" = "s" ]
-then
+cmd_start() {
 	set -e
-	docker build -t=$tag "$(dirname "$0")"
-	if [ $(docker ps -af name=$name | wc -l) -ge 2 ];
-	then
-		echo "Resuming session.."
-		docker start $name
+	if [ $(docker ps -af name=$KALI_NAME -f status=running | wc -l) -ge 2 ]; then
+		echo "An instance is already running!"
 	else
-		echo "Creating new session.."
-		docker run -p=$port:3389 --name=$name $tag
+		docker build -t=$KALI_TAG "$(dirname "$0")"
+		if [ $(docker ps -af name=$KALI_NAME | wc -l) -ge 2 ]; then
+			if [ -z "$KALI_DETACH" ]; then opt=-a; fi
+			echo "Resuming session.."
+			docker start $opt $KALI_NAME
+		else
+			if [ ! -z "$KALI_DETACH" ]; then opt=-d; fi
+			echo "Creating new session.."
+			docker run $opt -p=$KALI_PORT:3389 --name=$KALI_NAME $KALI_TAG
+		fi
 	fi
+}
 
-elif [ "$1" = "reset" ] || [ "$1" = "r" ]
-then
-	bash $0 e
-	docker rm $name >/dev/null
-	bash $0 s
+# STOPS DESKTOP ENVIRONEMENT
+# Or does nothing if none does exists yet
+# ############################
 
-elif [ "$1" = "stop" ] || [ "$1" = "e" ]
-then
-	if [ $(docker ps -af name=$name | wc -l) -ge 2 ];
-	then
+cmd_stop() {
+	if [ $(docker ps -af name=$KALI_NAME -f status=running | wc -l) -ge 2 ]; then
 		echo "Stopping session.."
-		docker stop $name -t=3 >/dev/null
+		docker stop $KALI_NAME -t=3 >/dev/null
 	else
 		echo "No KaliLinux instances found!"
 	fi
+}
 
-elif [ "$1" = "clear" ] || [ "$1" = "c" ]
-then
-	bash $0 e
+# REMOVE INSTANCE
+# Or does nothing if there's no instance yet
+# ############################
+
+cmd_del() {
+	cmd_stop
 	echo "Removing instances.."
-	docker rm $name >/dev/null
-	docker rmi $tag 
+	docker rm $KALI_NAME >/dev/null
+}
 
-else
-	echo "Unknown command: $1"
-	bash $0
-	exit 1
-fi
+# READ ARGUMENT
+# And execute the corresponding functions
+# ############################
+
+while [[ $# -gt 0 ]]
+do
+	case "$1" in
+	h|help|'')
+		cmd_help;;
+	s|start)
+		cmd_start;;
+	r|reset)
+		cmd_del
+		cmd_start;;
+	e|stop)
+		cmd_stop;;
+	c|clear)
+		cmd_del
+		docker rmi $KALI_TAG;;
+	*)
+		echo "Unknown command: $1"
+		cmd_help
+		exit 1;;
+	esac
+	shift
+done
