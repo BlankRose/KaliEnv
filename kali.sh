@@ -6,7 +6,7 @@
 #    '-._.(;;;)._.-'                                                           #
 #    .-'  ,`"`,  '-.                                                           #
 #   (__.-'/   \'-.__)  By: Rosie (https://github.com/BlankRose)                #
-#       //\   /        Last Updated: February 09, 2024 [01:35 pm]              #
+#       //\   /        Last Updated: February 09, 2024 [02:00 pm]              #
 #      ||  '-'                                                                 #
 # ############################################################################ #
 
@@ -14,8 +14,8 @@
 # And replace with defaults if non-existant
 # ############################
 
-names=(KALI_TAG   KALI_NAME  KALI_PORT)
-value=(kali-home  kali       5500     )
+names=(KALI_TAG   KALI_NAME  KALI_PORT  KALI_USER  KALI_PASS)
+value=(kali-home  kali       5500       kali       kali     )
 
 for i in "${!names[@]}"; do
 	if [ -z "${!names[$i]}" ]; then
@@ -43,16 +43,20 @@ cmd_help() {
 # ############################
 
 cmd_start() {
-	set -e
 	if [ $(docker ps -af name=$KALI_NAME -f status=running | wc -l) -ge 2 ]; then
 		echo "An instance is already running!"
 	else
-		docker build -t=$KALI_TAG "$(dirname "$0")"
 		if [ $(docker ps -af name=$KALI_NAME | wc -l) -ge 2 ]; then
 			if [ -z "$KALI_DETACH" ]; then opt=-a; fi
 			echo "Resuming session.."
 			docker start $opt $KALI_NAME
 		else
+			if [ $(docker images -f reference=kali-home | wc -l) -lt 2 ]; then
+				docker build -t=$KALI_TAG \
+					--build-arg="user=$KALI_USER" \
+					--build-arg="pass=$KALI_PASS" \
+					"$(dirname "$0")"
+			fi
 			if [ ! -z "$KALI_DETACH" ]; then opt=-d; fi
 			echo "Creating new session.."
 			docker run $opt -p=$KALI_PORT:3389 --name=$KALI_NAME $KALI_TAG
@@ -77,10 +81,11 @@ cmd_stop() {
 # Or does nothing if there's no instance yet
 # ############################
 
-cmd_del() {
+cmd_clear() {
 	cmd_stop
 	echo "Removing instances.."
 	docker rm $KALI_NAME >/dev/null
+	docker rmi $KALI_TAG > /dev/null
 }
 
 # READ ARGUMENT
@@ -95,13 +100,12 @@ do
 	s|start)
 		cmd_start;;
 	r|reset)
-		cmd_del
+		cmd_clear
 		cmd_start;;
 	e|stop)
 		cmd_stop;;
 	c|clear)
-		cmd_del
-		docker rmi $KALI_TAG;;
+		cmd_clear;;
 	*)
 		echo "Unknown command: $1"
 		cmd_help
