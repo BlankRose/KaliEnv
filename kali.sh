@@ -6,7 +6,7 @@
 #    '-._.(;;;)._.-'                                                           #
 #    .-'  ,`"`,  '-.                                                           #
 #   (__.-'/   \'-.__)  By: Rosie (https://github.com/BlankRose)                #
-#       //\   /        Last Updated: February 09, 2024 [02:17 pm]              #
+#       //\   /        Last Updated: February 09, 2024 [04:32 pm]              #
 #      ||  '-'                                                                 #
 # ############################################################################ #
 
@@ -47,7 +47,7 @@ cmd_start() {
 		echo "An instance is already running!"
 	else
 		if [ $(docker ps -af name=$KALI_NAME | wc -l) -ge 2 ]; then
-			if [ -z "$KALI_DETACH" ]; then opt=-a; fi
+			if [ ! -z "$KALI_ATTACH" ]; then opt=-a; fi
 			echo "Resuming session.."
 			docker start $opt $KALI_NAME
 		else
@@ -58,7 +58,14 @@ cmd_start() {
 					--build-arg="pass=$KALI_PASS" \
 					"$(dirname "$0")"
 			fi
-			if [ ! -z "$KALI_DETACH" ]; then opt=-d; fi
+
+			if [ -z "$KALI_ATTACH" ]; then opt=-d; fi
+			if [ ! -z "$KALI_VOLUMES" ]; then
+				for i in $(echo "$KALI_VOLUMES" | tr "," "\n"); do
+					opt="$opt -v $i"
+				done
+			fi
+
 			echo "Creating new session.."
 			docker run $opt -p=$KALI_PORT:3389 --name=$KALI_NAME $KALI_TAG
 		fi

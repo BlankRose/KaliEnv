@@ -38,6 +38,26 @@ Command        | Shorthand     | Description
 
 ------------------
 
+# Shared Folders
+
+By exporting the environnement variable `KALI_VOLUMES`, you can define a list, seperated by
+commas, of volumes to setup on the creation on the environnement. Each element are represented
+as such:
+
+`host:container` where `host` is the path on the local machine and `container` is the path in
+the dockerized KaliLinux.
+
+You can also add a third argument to define wheter Kali can read, or write (`host:container:permission`)
+with the following valid values:
+- `ro`: Read Only
+- `rw`: Read Write (Default)
+
+*Note: For the docker expert out there, and those who knows how to use volumes: the whole string
+is seperated at commas and then passed, whole, to the option `-v` of `docker run` and as such,
+you can use all availables features volumes may offer*
+
+------------------
+
 # Customizing
 
 You can freely customize the behaviours, such the port, or the login by exporting the following environnement variables:
@@ -50,4 +70,5 @@ Name           | Default Value | Description
 `KALI_USER`    | `kali`        | Name of the user created on first initialization
 `KALI_PASS`    | `kali`        | Password of the user created on first initialization
 `KALI_ENV`     | `i3`          | Name of the desktop environnement ([kali-desktop-`$KALI_ENV`](https://www.kali.org/tools/kali-meta/))
+`KALI_VOLUMES` |               | List seperated by commas, which defines volumes to setup
 `KALI_DETACH`  |               | When defined, on start it will runs on background instead
