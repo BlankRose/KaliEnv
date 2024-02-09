@@ -2,11 +2,11 @@
 # ############################################################################ #
 #          .-.                                                                 #
 #    __   /   \   __                                                           #
-#   (  `'.\   /.'`  )  kali.sh                                                 #
+#   (  `'.\   /.'`  )  kali                                                    #
 #    '-._.(;;;)._.-'                                                           #
 #    .-'  ,`"`,  '-.                                                           #
 #   (__.-'/   \'-.__)  By: Rosie (https://github.com/BlankRose)                #
-#       //\   /        Last Updated: February 09, 2024 [04:32 pm]              #
+#       //\   /        Last Updated: February 09, 2024 [04:42 pm]              #
 #      ||  '-'                                                                 #
 # ############################################################################ #
 
@@ -99,6 +99,11 @@ cmd_clear() {
 # READ ARGUMENT
 # And execute the corresponding functions
 # ############################
+
+if [ $# -eq 0 ]; then
+	cmd_help
+	exit 0
+fi
 
 while [[ $# -gt 0 ]]
 do
